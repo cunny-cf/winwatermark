@@ -7,6 +7,7 @@ if ([string]::IsNullOrWhiteSpace($mainText)) {
     $mainText = "Activate Windows"
 }
 
+
 # Prompt for the description text (default: "Go to Settings to activate Windows")
 $subText = Read-Host "Enter the description text (default: 'Go to Settings to activate Windows')"
 if ([string]::IsNullOrWhiteSpace($subText)) {
@@ -64,21 +65,18 @@ $exStyle = [WinAPI]::GetWindowLong($hwnd, -20)
 [WinAPI]::SetWindowLong($hwnd, -20, $exStyle -bor 0x80000 -bor 0x20)
 
 # Background job to refresh TopMost
-$script:running = $true
-$job = Start-Job -ScriptBlock {
-    $lastUpdate = [DateTime]::MinValue
-    while ($script:running) {
-        $now = [DateTime]::Now
-        if (($now - $lastUpdate).TotalSeconds -ge 10) {
-            $form.Invoke([Action]{
-                $form.TopMost = $false
-                $form.TopMost = $true
-            })
-            $lastUpdate = $now
-        }
-        Start-Sleep -Seconds 1
-    }
-}
+# Create a timer to refresh TopMost every 10 seconds
+$timer = New-Object System.Windows.Forms.Timer
+$timer.Interval = 10000  # milliseconds (10 sec)
+$timer.Add_Tick({
+    $form.TopMost = $false
+    $form.TopMost = $true
+})
+
+# Start the timer
+$timer.Start()
+
+
 
 Write-Host "Job started successfully."
 
@@ -86,8 +84,6 @@ Write-Host "Job started successfully."
 $form.Add_FormClosed({
     Write-Host "Form closed. Stopping the background task."
     $script:running = $false
-    Stop-Job $job
-    Remove-Job $job
 })
 
 # Show the form
