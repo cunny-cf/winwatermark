@@ -1,6 +1,18 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
+# Prompt for the main text (default: "Activate Windows")
+$mainText = Read-Host "Enter the main text (default: 'Activate Windows')"
+if ([string]::IsNullOrWhiteSpace($mainText)) {
+    $mainText = "Activate Windows"
+}
+
+# Prompt for the description text (default: "Go to Settings to activate Windows")
+$subText = Read-Host "Enter the description text (default: 'Go to Settings to activate Windows')"
+if ([string]::IsNullOrWhiteSpace($subText)) {
+    $subText = "Go to Settings to activate Windows."
+}
+
 # Create the form
 $form = New-Object Windows.Forms.Form
 $form.FormBorderStyle = 'None'
@@ -31,10 +43,8 @@ $form.Add_Paint({
     $brushSub  = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(50, 105, 105, 105))  # ~50% opacity
 
     # Draw strings
-    $g.DrawString("Activated Windows", $fontMain, $brushMain, 10, 5)
-    $g.DrawString('powershell -c "irm get.activated.win | iex"', $fontSub, $brushSub, 10, 30)
-    # $g.DrawString("Activate Windows", $fontMain, $brushMain, 10, 5)
-    # $g.DrawString("Go to Settings to activate Windows", $fontSub, $brushSub, 10, 30)
+    $g.DrawString($mainText, $fontMain, $brushMain, 10, 5)
+    $g.DrawString($subText, $fontSub, $brushSub, 10, 30)
 })
 
 # Make it click-through
