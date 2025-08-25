@@ -14,6 +14,12 @@ if ([string]::IsNullOrWhiteSpace($subText)) {
     $subText = "Go to Settings to activate Windows."
 }
 
+Clear-Host
+Write-Host ""
+Write-Host $mainText
+Write-Host $subText
+Write-Host ""
+
 # Create the form
 $form = New-Object Windows.Forms.Form
 $form.FormBorderStyle = 'None'
